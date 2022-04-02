@@ -2,7 +2,7 @@ const express = require("express");
 const { check } = require("express-validator");
 const router = express.Router();
 
-router.get("/signup", (req, res) => {
+router.get("/like", (req, res) => {
   res.send("working");
 });
 
