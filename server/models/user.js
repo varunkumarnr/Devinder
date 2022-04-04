@@ -16,8 +16,12 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  age: {
+    type: Number
+  },
   gender: {
-    type: String
+    type: String,
+    required: true
   },
   city: { type: String },
   country: { type: String },
@@ -33,9 +37,7 @@ const UserSchema = new Schema({
     type: String
   },
   profle_picture: {
-    type: String,
-    default:
-      "https://res.cloudinary.com/varunnrk/image/upload/v1617635408/Alliance%20chat/pic1_jay2ch.jpg"
+    type: String
   },
   verified: {
     type: Boolean,
@@ -49,13 +51,13 @@ const UserSchema = new Schema({
   Matches: [
     {
       type: Schema.Types.ObjectId,
-      ref: "User"
+      ref: "Match"
     }
   ],
   likes: [
     {
       type: Schema.Types.ObjectId,
-      ref: "User"
+      ref: "Like"
     }
   ],
   //   servers: [
