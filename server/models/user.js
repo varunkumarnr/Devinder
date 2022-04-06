@@ -25,7 +25,7 @@ const UserSchema = new Schema({
   },
   city: { type: String },
   country: { type: String },
-  interests: { type: String, default: "No description..." },
+  interests: { type: [String] },
   lastActive: { type: Date },
   // channels: [
   //   {
@@ -51,13 +51,14 @@ const UserSchema = new Schema({
   Matches: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Match"
+      ref: "User"
     }
   ],
+  posts: [{ type: String }],
   likes: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Like"
+      ref: "User"
     }
   ],
   //   servers: [

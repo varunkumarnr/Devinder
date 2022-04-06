@@ -45,5 +45,7 @@ router.post(
 );
 router.get("/profile/:username", userContoller.getUser);
 router.get("/me", auth, userContoller.me);
+router.get("/profileid/:id", userContoller.getUserById);
+router.post("/edit", auth, userContoller.EditProfile);
 router.get("/logout", auth, userContoller.logout);
 module.exports = router;

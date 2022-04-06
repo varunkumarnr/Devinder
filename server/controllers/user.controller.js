@@ -4,6 +4,10 @@ require("dotenv").config();
 const config = process.env.jwtsecret;
 const { validationResult } = require("express-validator");
 const User = require("../models/user");
+/* 
+Task: Sign Up 
+Action: Post
+*/
 const signUp = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -50,13 +54,13 @@ const signUp = async (req, res) => {
     if (RandomNo <= 1) {
       profilePicURL = profileImages[0];
     } else {
-      profilePicURL = profilePicURL[2];
+      profilePicURL = profileImages[2];
     }
   } else {
     if (RandomNo <= 1) {
       profilePicURL = profileImages[1];
     } else {
-      profilePicURL = profilePicURL[3];
+      profilePicURL = profileImages[3];
     }
   }
   const createdUser = new User({
@@ -94,6 +98,10 @@ const signUp = async (req, res) => {
     });
   }
 };
+/* 
+Task: Login 
+Action: Post
+*/
 const Login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -143,6 +151,10 @@ const Login = async (req, res) => {
   existinguser.online = true;
   await existinguser.save();
 };
+/* 
+Task: get User 
+Action: Get User information of respctive Username
+*/
 const getUser = async (req, res) => {
   const username = req.params.username;
   if (req.query.skip === undefined) {
@@ -161,9 +173,15 @@ const getUser = async (req, res) => {
         .json({ success: false, errors: [{ msg: "User not found" }] });
     }
 
-    return res.json({ success: true, data: user });;
+    return res.json({ success: true, data: user });
   }
 };
+
+/* 
+Task: me 
+Action: Get authenticated user profile
+Auth: True
+*/
 const me = async (req, res) => {
   try {
     const profile = await User.findById(req.user.id).select("-password");
@@ -180,14 +198,18 @@ const me = async (req, res) => {
       .json({ success: false, errors: [{ msg: "server error" }] });
   }
 };
-
-const getUserById = async (req,res) => {
+/* 
+Task: get User 
+Action: Get User information of respctive Id
+*/
+const getUserById = async (req, res) => {
   try {
-    const profile = await User.findById({id:_id}).select("-password");
-    if(!profile) {
+    const profile = await User.findById(req.params.id).select("-password");
+    if (!profile) {
       return res.status(400).json({
-        success: false, errors: [{ msg : "no such users"}]
-      })
+        success: false,
+        errors: [{ msg: "no such users" }]
+      });
     }
     res.json({ success: true, data: profile });
   } catch (err) {
@@ -195,8 +217,78 @@ const getUserById = async (req,res) => {
       .status(500)
       .json({ success: false, errors: [{ msg: "server error" }] });
   }
-}
-
+};
+/*
+Task Edit profile
+*/
+const EditProfile = async (req, res) => {
+  const {
+    age,
+    gender,
+    city,
+    country,
+    interests,
+    description,
+    profle_picture,
+    status
+  } = req.body;
+  const profileFields = {};
+  profileFields.user = req.user.id;
+  if (age) {
+    profileFields.age = age;
+  }
+  if (gender) {
+    profileFields.gender = gender;
+  }
+  if (city) {
+    profileFields.city = city;
+  }
+  if (country) {
+    profileFields.country = country;
+  }
+  if (interests) {
+    profileFields.interests = interests
+      .toString()
+      .split(",")
+      .map(interest => " " + interest.trim());
+  }
+  if (description) {
+    profileFields.description = description;
+  }
+  if (status) {
+    profileFields.status = status;
+  }
+  if (profle_picture) {
+    profileFields.profle_picture = profle_picture;
+  }
+  try {
+    let profile = await User.findById(req.user.id);
+    if (profile) {
+      await User.findOneAndUpdate(
+        { _id: req.user.id },
+        profileFields
+        // {
+        //   age,
+        //   gender,
+        //   interests,
+        //   city,
+        //   country,
+        //   description,
+        //   profle_picture,
+        //   status
+        // }
+      );
+      await profile.save();
+      return res.json({ msg: "Profile Updated Sucessfully" });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+/* 
+Task: Logot
+Action: Logout
+*/
 const logout = async (req, res) => {
   try {
     await User.findById(req.user.id).then(rUser => {
@@ -211,4 +303,12 @@ const logout = async (req, res) => {
       .json({ success: false, errors: [{ msg: "server error" }] });
   }
 };
-module.exports = { signUp, Login, getUser, me,getUserById ,logout };
+module.exports = {
+  signUp,
+  Login,
+  getUser,
+  me,
+  getUserById,
+  EditProfile,
+  logout
+};
