@@ -34,8 +34,8 @@ const LikePost = async (req, res) => {
       });
     }
     await Like.findOneAndDelete({
-      likerId: userId,
-      likeeId: profile
+      likerId: req.user.id,
+      likeeId: req.params.id
     }).exec();
     return res.status(200).json({
       msg: `${profile.username} as been removed from your liked profiles`

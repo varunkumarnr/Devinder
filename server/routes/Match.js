@@ -7,4 +7,5 @@ const auth = require("../middleware/auth");
 //   res.send("match working");
 // });
 router.post("/:id", auth, matchController.acceptMatchReq);
+router.post("/unmatch/:id", auth, matchController.unMatch);
 module.exports = router;
