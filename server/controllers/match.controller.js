@@ -106,13 +106,32 @@ const unMatch = async (req, res) => {
         likerId: UserProfile,
         likeeId: Profile
       }).exec();
-      return res.json("unmatched");
+      return res.json({ msg: "unmatched" });
     } catch (err) {
       console.log("error here");
-      return res.json("fidn");
+      return res.json({ msg: err.message });
     }
   } else {
     return res.status(500).json({ msg: "Not Matched" });
   }
 };
-module.exports = { acceptMatchReq, unMatch };
+
+const getAllMatches = async (req, res) => {
+  let userId = req.user.id;
+  let userProfile = await User.findById(userId);
+  if (!userProfile) {
+    return res.status(500).json({ msg: "user not autheticated" });
+  }
+  try {
+    const currentUser = await User.findById(userId).populate(
+      "Matches",
+      "username profle_picture age gender interests"
+    );
+    const data = currentUser.Matches;
+    return res.json({ data: data });
+  } catch (err) {
+    console.log(err.message);
+    return res.json(err.message);
+  }
+};
+module.exports = { acceptMatchReq, unMatch, getAllMatches };
