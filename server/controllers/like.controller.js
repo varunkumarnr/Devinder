@@ -10,6 +10,7 @@ const LikePost = async (req, res) => {
       errors: [{ msg: "No such profile" }]
     });
   }
+
   const userId = await User.findById(req.user.id);
   const alreadyLiked = await Like.findOne({
     likerId: userId,
@@ -18,16 +19,20 @@ const LikePost = async (req, res) => {
   if (alreadyLiked) {
     try {
       await User.findOneAndUpdate(
-        { _id: req.user.id },
+        { _id: req.params.id },
         {
-          $pull: { likes: req.params.id }
+          $pull: { likes: req.user.id }
         },
         {
           new: true
         }
       );
     } catch (err) {}
-
+    if (userId.Matches.includes(req.params.id)) {
+      return res.status(200).json({
+        msg: `you are already Matched with ${profile.username}`
+      });
+    }
     await Like.findOneAndDelete({
       likerId: userId,
       likeeId: profile
@@ -42,8 +47,8 @@ const LikePost = async (req, res) => {
   });
   try {
     await like.save();
-    User.findById(req.user.id).then(rUser => {
-      rUser.likes.push(profile._id);
+    User.findById(req.params.id).then(rUser => {
+      rUser.likes.push(req.user.id);
       rUser.save();
     });
     return res
