@@ -7,5 +7,5 @@ const auth = require("../middleware/auth");
 //   res.send("working");
 // });
 router.post("/:id", auth, likeController.LikePost);
-
+router.get("/", auth, likeController.getAllLikedProfiles);
 module.exports = router;

@@ -62,5 +62,22 @@ const LikePost = async (req, res) => {
   }
 };
 
-const getLikedProfiles = (req, res) => {};
-module.exports = { LikePost, getLikedProfiles };
+const getAllLikedProfiles = async (req, res) => {
+  let userId = req.user.id;
+  let userProfile = await User.findById(userId);
+  if (!userProfile) {
+    return res.status(500).json({ msg: "user not autheticated" });
+  }
+  try {
+    const currentUser = await User.findById(userId).populate(
+      "Matches",
+      "username profle_picture age gender interests"
+    );
+    const data = currentUser.likes;
+    return data;
+  } catch (err) {
+    console.log(err.message);
+    return res.json(err.message);
+  }
+};
+module.exports = { LikePost, getAllLikedProfiles };
